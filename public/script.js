@@ -1,21 +1,9 @@
+import { response } from "express";
+
 const data = [];
 function loginConfirm() {
   const email = document.getElementById("email-login").value;
   const password = document.getElementById("password-login").value;
-
-  console.log(email, password);
-  if (
-    sessionStorage.getItem("email") == email &&
-    sessionStorage.getItem("password") == password
-  ) {
-    alert("Sikeres bejelentkezés");
-    document.getElementById("email-login").value = "";
-    document.getElementById("password-login").value = "";
-    return;
-  } else {
-    alert("A jelszó vagy az email nem helyes");
-    return;
-  }
 }
 function showRegisterPage() {
   document.getElementById("password-register").type = "password";
@@ -35,6 +23,7 @@ function showLoginPage() {
   document.getElementById("login-button").style.display = "block";
   document.getElementById("register-page").style.display = "block";
 }
+
 document.getElementById("register-button").addEventListener("click", () => {
   const email = document.getElementById("email-login").value;
   const password = document.getElementById("password-register").value;
@@ -43,18 +32,23 @@ document.getElementById("register-button").addEventListener("click", () => {
     alert("Nem egyezik meg a két jelszó!");
     return;
   }
-  data.push(email, password);
-  console.log(data);
-  if (
-    sessionStorage.getItem("email") == "" ||
-    sessionStorage.getItem("password") == ""
-  ) {
-    alert("Minden mező kitöltése kötelező!");
+  if (!email || !password || !repeat) {
+    alert("Minden mezőt ki kell tölteni!");
+    return;
   }
+  fetch("http://localhost:3000/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  }).then((response) => {
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  });
   alert("Sikeres a regisztráció");
-  sessionStorage.setItem("email", email);
-  sessionStorage.setItem("password", password);
-  sessionStorage.setItem("repeat", repeat);
   document.getElementById("password-register").value = "";
   document.getElementById("password-repeat").value = "";
   showLoginPage();
